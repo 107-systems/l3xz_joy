@@ -74,7 +74,7 @@ void JoystickNode::joystickThreadFunc()
 
     if (evt.isAxis())
     {
-      RCLCPP_INFO(get_logger(), "Axis %d: %d", evt.number, evt.value);
+      RCLCPP_DEBUG(get_logger(), "Axis %d: %d", evt.number, evt.value);
 
       float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
 
@@ -84,7 +84,7 @@ void JoystickNode::joystickThreadFunc()
     }
 
     if (evt.isButton()) {
-      RCLCPP_INFO(get_logger(), "Button %d: %d", evt.number, evt.value);
+      RCLCPP_DEBUG(get_logger(), "Button %d: %d", evt.number, evt.value);
       
       std::lock_guard<std::mutex> lock(_joy_mtx);
       if (isValidButtonId(evt.number))
