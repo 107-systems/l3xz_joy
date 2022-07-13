@@ -1,6 +1,7 @@
 <a href="https://107-systems.org/"><img align="right" src="https://raw.githubusercontent.com/107-systems/.github/main/logo/107-systems.png" width="15%"></a>
 :floppy_disk: `l3xz_joy`
 ========================
+[![Spell Check status](https://github.com/107-systems/l3xz_joy/actions/workflows/spell-check-task.yml/badge.svg)](https://github.com/107-systems/l3xz_joy/actions/workflows/spell-check-task.yml)
 
 A generic PS3 joystick driver for feeding the [l3xz_teleop](https://github.com/107-systems/l3xz_teleop) node.
 
