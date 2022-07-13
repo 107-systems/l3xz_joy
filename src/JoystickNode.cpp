@@ -86,7 +86,7 @@ void JoystickNode::joystickThreadFunc()
 
         float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
 
-        if (axis_scaled_val > get_parameter("joy_deadzone").as_double())
+        if (abs(axis_scaled_val) > get_parameter("joy_deadzone").as_double())
           _joy_msg.axes[AXIS_TO_ARRAY_MAP.at(evt.number)] = axis_scaled_val;
         else
           _joy_msg.axes[AXIS_TO_ARRAY_MAP.at(evt.number)] = 0.0;
