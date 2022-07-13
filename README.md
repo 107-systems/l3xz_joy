@@ -22,3 +22,15 @@ Display the published messages by
 ```bash
 ros2 topic echo /l3xz/joy
 ```
+
+#### Interface Documentation
+##### Published Topics
+| Default name | Type |
+|:-:|:-:|
+| `/joy` | [`sensor_msgs/Joy`](http://docs.ros.org/en/api/sensor_msgs/html/msg/Joy.html) |
+
+##### Parameters
+| Name | Default | Description |
+|:-:|:-:|-|
+| `joy_dev_node` | `/dev/input/js0` | Name of input device node under which joystick is registered in Linux. |
+| `joy_topic` | `/joy` | Name of topic for publishing the joystick message. |
