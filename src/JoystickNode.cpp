@@ -40,12 +40,13 @@ JoystickNode::JoystickNode()
 {
   declare_parameter("joy_dev_node", "/dev/input/js0");
   declare_parameter("joy_topic", "joy");
+  declare_parameter("joy_topic_publish_period_ms", 50);
 
   _joy_pub = create_publisher<sensor_msgs::msg::Joy>
     (get_parameter("joy_topic").as_string(), 10);
   
   _joy_pub_timer = create_wall_timer
-    (std::chrono::milliseconds(50), [this]() { this->joystickPubFunc(); });
+    (std::chrono::milliseconds(get_parameter("joy_topic_publish_period_ms").as_int()), [this]() { this->joystickPubFunc(); });
 
   _joystick   = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());
   _joy_thread = std::thread([this]() { this->joystickThreadFunc(); });
