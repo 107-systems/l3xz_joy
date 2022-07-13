@@ -41,6 +41,7 @@ JoystickNode::JoystickNode()
   declare_parameter("joy_dev_node", "/dev/input/js0");
   declare_parameter("joy_topic", "joy");
   declare_parameter("joy_topic_publish_period_ms", 50);
+  declare_parameter("joy_deadzone", 0.01);
 
   _joy_pub = create_publisher<sensor_msgs::msg::Joy>
     (get_parameter("joy_topic").as_string(), 10);
@@ -79,11 +80,17 @@ void JoystickNode::joystickThreadFunc()
     {
       RCLCPP_DEBUG(get_logger(), "Axis %d: %d", evt.number, evt.value);
 
-      float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
-
-      std::lock_guard<std::mutex> lock(_joy_mtx);
       if (isValidAxisId(evt.number))
-        _joy_msg.axes[AXIS_TO_ARRAY_MAP.at(evt.number)] = axis_scaled_val;
+      {
+        std::lock_guard<std::mutex> lock(_joy_mtx);
+
+        float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
+
+        if (abs(axis_scaled_val) > get_parameter("joy_deadzone").as_double())
+          _joy_msg.axes[AXIS_TO_ARRAY_MAP.at(evt.number)] = axis_scaled_val;
+        else
+          _joy_msg.axes[AXIS_TO_ARRAY_MAP.at(evt.number)] = 0.0;
+      }
     }
 
     if (evt.isButton()) {
