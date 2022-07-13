@@ -35,3 +35,4 @@ ros2 topic echo /l3xz/joy
 | `joy_dev_node` | `/dev/input/js0` | Name of input device node under which joystick is registered in Linux. |
 | `joy_topic` | `/joy` | Name of topic for publishing the joystick message. |
 | `joy_topic_publish_period_ms` | 50 | Publishing period for the joystick message in milliseconds (ms). |
+| `joy_deadzone` | 0.01 | Deadzone of the joystick, if the axis value is below this value than 0.0 is reported instead. |
