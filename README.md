@@ -2,7 +2,7 @@
 :floppy_disk: `l3xz_joy`
 ========================
 
-PS3 joystick driver for feeding l3xz_teleop node.
+A generic PS3 joystick driver for feeding the [l3xz_teleop](https://github.com/107-systems/l3xz_teleop) node.
 
 #### How-to-build
 ```bash
