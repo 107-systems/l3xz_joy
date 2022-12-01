@@ -17,17 +17,24 @@
 
 #include <sensor_msgs/msg/joy.hpp>
 
-#include "Joystick.h"
+#include "PS3/Joystick.h"
+
+/**************************************************************************************
+ * NAMESPACE
+ **************************************************************************************/
+
+namespace l3xz::joystick
+{
 
 /**************************************************************************************
  * CLASS DECLARATION
  **************************************************************************************/
 
-class JoystickNode : public rclcpp::Node
+class Node : public rclcpp::Node
 {
 public:
-   JoystickNode();
-  ~JoystickNode();
+   Node();
+  ~Node();
 
 private:
   rclcpp::TimerBase::SharedPtr _joy_pub_timer;
@@ -35,7 +42,7 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr _joy_pub;
   sensor_msgs::msg::Joy _joy_msg;
 
-  std::shared_ptr<Joystick> _joystick;
+  std::shared_ptr<ps3::Joystick> _joystick;
   std::mutex _joy_mtx;
   std::thread _joy_thread;
   std::atomic<bool> _joy_thread_active;
@@ -43,3 +50,9 @@ private:
   void joystickThreadFunc();
   void joystickPubFunc();
 };
+
+/**************************************************************************************
+ * NAMESPACE
+ **************************************************************************************/
+
+} /* l3xz::joystick */

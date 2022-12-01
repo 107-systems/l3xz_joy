@@ -8,28 +8,35 @@
  * INCLUDE
  **************************************************************************************/
 
-#include <l3xz_joy/JoystickNode.h>
+#include <l3xz_joy/Node.h>
 
 #include <chrono>
 #include <limits>
 #include <numeric>
 
-#include <l3xz_joy/PS3_Const.h>
+#include <l3xz_joy/PS3/PS3_Const.h>
+
+/**************************************************************************************
+ * NAMESPACE
+ **************************************************************************************/
+
+namespace l3xz::joystick
+{
 
 /**************************************************************************************
  * CTOR/DTOR 
  **************************************************************************************/
 
-JoystickNode::JoystickNode()
-: Node("l3xz_joy")
+Node::Node()
+: rclcpp::Node("l3xz_joy")
 ,_joy_msg{
     []()
     {
       sensor_msgs::msg::Joy msg;
 
       msg.header.frame_id = "joy";
-      msg.axes.resize(NUM_AXES);
-      msg.buttons.resize(NUM_BUTTONS);
+      msg.axes.resize(ps3::NUM_AXES);
+      msg.buttons.resize(ps3::NUM_BUTTONS);
 
       return msg;
     } ()
@@ -49,11 +56,11 @@ JoystickNode::JoystickNode()
   _joy_pub_timer = create_wall_timer
     (std::chrono::milliseconds(get_parameter("joy_topic_publish_period_ms").as_int()), [this]() { this->joystickPubFunc(); });
 
-  _joystick   = std::make_shared<Joystick>(get_parameter("joy_dev_node").as_string());
+  _joystick   = std::make_shared<ps3::Joystick>(get_parameter("joy_dev_node").as_string());
   _joy_thread = std::thread([this]() { this->joystickThreadFunc(); });
 }
 
-JoystickNode::~JoystickNode()
+Node::~Node()
 {
   _joy_thread_active = false;
   _joy_thread.join();
@@ -63,7 +70,7 @@ JoystickNode::~JoystickNode()
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
 
-void JoystickNode::joystickThreadFunc()
+void Node::joystickThreadFunc()
 {
   _joy_thread_active = true;
 
@@ -71,7 +78,7 @@ void JoystickNode::joystickThreadFunc()
 
   while (_joy_thread_active)
   {
-    JoystickEvent const evt = _joystick->update();
+    ps3::JoystickEvent const evt = _joystick->update();
 
     if (evt.isInit())
       continue;
@@ -80,16 +87,16 @@ void JoystickNode::joystickThreadFunc()
     {
       RCLCPP_DEBUG(get_logger(), "Axis %d: %d", evt.number, evt.value);
 
-      if (isValidAxisId(evt.number))
+      if (ps3::isValidAxisId(evt.number))
       {
         std::lock_guard<std::mutex> lock(_joy_mtx);
 
         float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
 
         if (abs(axis_scaled_val) > get_parameter("joy_deadzone").as_double())
-          _joy_msg.axes[AXIS_TO_ARRAY_MAP.at(evt.number)] = axis_scaled_val;
+          _joy_msg.axes[ps3::AXIS_TO_ARRAY_MAP.at(evt.number)] = axis_scaled_val;
         else
-          _joy_msg.axes[AXIS_TO_ARRAY_MAP.at(evt.number)] = 0.0;
+          _joy_msg.axes[ps3::AXIS_TO_ARRAY_MAP.at(evt.number)] = 0.0;
       }
     }
 
@@ -97,13 +104,13 @@ void JoystickNode::joystickThreadFunc()
       RCLCPP_DEBUG(get_logger(), "Button %d: %d", evt.number, evt.value);
       
       std::lock_guard<std::mutex> lock(_joy_mtx);
-      if (isValidButtonId(evt.number))
-        _joy_msg.buttons[BUTTON_TO_ARRAY_MAP.at(evt.number)] = evt.value;
+      if (ps3::isValidButtonId(evt.number))
+        _joy_msg.buttons[ps3::BUTTON_TO_ARRAY_MAP.at(evt.number)] = evt.value;
     }
   }
 }
 
-void JoystickNode::joystickPubFunc()
+void Node::joystickPubFunc()
 {
   std::lock_guard<std::mutex> lock(_joy_mtx);
 
@@ -111,3 +118,9 @@ void JoystickNode::joystickPubFunc()
 
   _joy_pub->publish(_joy_msg);
 }
+
+/**************************************************************************************
+ * NAMESPACE
+ **************************************************************************************/
+
+} /* l3xz::joystick */

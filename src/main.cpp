@@ -8,7 +8,9 @@
  * INCLUDE
  **************************************************************************************/
 
-#include <l3xz_joy/JoystickNode.h>
+#include <rclcpp/rclcpp.hpp>
+
+#include <l3xz_joy/Node.h>
 
 /**************************************************************************************
  * MAIN
@@ -18,7 +20,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-  auto node = std::make_shared<JoystickNode>();
+  auto node = std::make_shared<l3xz::joystick::Node>();
 
   try
   {
