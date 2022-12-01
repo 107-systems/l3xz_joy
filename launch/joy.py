@@ -9,6 +9,7 @@ def generate_launch_description():
       name='joy',
       namespace='l3xz',
       output='screen',
+      emulate_tty=True,
       parameters=[
         {'joy_dev_node': '/dev/input/js0'},
         {'joy_topic': 'joy'},
