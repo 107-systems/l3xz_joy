@@ -80,8 +80,10 @@ void Node::joystickThreadFunc()
   {
     ps3::JoystickEvent const evt = _joystick->update();
 
-    if (evt.isInit())
+    if (evt.isInit()) {
+      RCLCPP_INFO_ONCE(get_logger(), "PS3 joystick has been successfully initialized.");
       continue;
+    }
 
     if (evt.isAxis())
     {
