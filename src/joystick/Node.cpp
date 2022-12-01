@@ -74,7 +74,7 @@ void Node::joystickThreadFunc()
 {
   _joy_thread_active = true;
 
-  RCLCPP_INFO(get_logger(), "Please press [START] on your PS3 joystick.");
+  RCLCPP_WARN(get_logger(), "Please press [START] on your PS3 joystick.");
 
   while (_joy_thread_active)
   {
