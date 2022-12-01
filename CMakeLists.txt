@@ -17,9 +17,9 @@ include_directories(
 )
 #######################################################################################
 add_executable(${L3XZ_JOY_TARGET}
-  src/Joystick.cpp
+  src/joystick/PS3/Joystick.cpp
+  src/joystick/Node.cpp
   src/main.cpp
-  src/JoystickNode.cpp
 )
 #######################################################################################
 target_compile_features(${L3XZ_JOY_TARGET} PRIVATE cxx_std_17)
