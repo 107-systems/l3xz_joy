@@ -78,36 +78,43 @@ void Node::joystickThreadFunc()
 
   while (_joy_thread_active)
   {
-    ps3::JoystickEvent const evt = _joystick->update();
+    std::optional<ps3::JoystickEvent> const evt = _joystick->update();
 
-    if (evt.isInit()) {
+    /* Skip the event processing if we have not received a valid
+     * joystick event. This is possible if a timeout or a read
+     * error have occurred.
+     */
+    if (!evt.has_value())
+      continue;
+
+    if (evt.value().isInit()) {
       RCLCPP_INFO_ONCE(get_logger(), "PS3 joystick has been successfully initialized.");
       continue;
     }
 
-    if (evt.isAxis())
+    if (evt.value().isAxis())
     {
-      RCLCPP_DEBUG(get_logger(), "Axis %d: %d", evt.number, evt.value);
+      RCLCPP_DEBUG(get_logger(), "Axis %d: %d", evt.value().number, evt.value().value);
 
-      if (ps3::isValidAxisId(evt.number))
+      if (ps3::isValidAxisId(evt.value().number))
       {
         std::lock_guard<std::mutex> lock(_joy_mtx);
 
-        float const axis_scaled_val = static_cast<float>(evt.value) / static_cast<float>(std::numeric_limits<int16_t>::max());
+        float const axis_scaled_val = static_cast<float>(evt.value().value) / static_cast<float>(std::numeric_limits<int16_t>::max());
 
         if (abs(axis_scaled_val) > get_parameter("joy_deadzone").as_double())
-          _joy_msg.axes[ps3::AXIS_TO_ARRAY_MAP.at(evt.number)] = axis_scaled_val;
+          _joy_msg.axes[ps3::AXIS_TO_ARRAY_MAP.at(evt.value().number)] = axis_scaled_val;
         else
-          _joy_msg.axes[ps3::AXIS_TO_ARRAY_MAP.at(evt.number)] = 0.0;
+          _joy_msg.axes[ps3::AXIS_TO_ARRAY_MAP.at(evt.value().number)] = 0.0;
       }
     }
 
-    if (evt.isButton()) {
-      RCLCPP_DEBUG(get_logger(), "Button %d: %d", evt.number, evt.value);
+    if (evt.value().isButton()) {
+      RCLCPP_DEBUG(get_logger(), "Button %d: %d", evt.value().number, evt.value().value);
       
       std::lock_guard<std::mutex> lock(_joy_mtx);
-      if (ps3::isValidButtonId(evt.number))
-        _joy_msg.buttons[ps3::BUTTON_TO_ARRAY_MAP.at(evt.number)] = evt.value;
+      if (ps3::isValidButtonId(evt.value().number))
+        _joy_msg.buttons[ps3::BUTTON_TO_ARRAY_MAP.at(evt.value().number)] = evt.value().value;
     }
   }
 }

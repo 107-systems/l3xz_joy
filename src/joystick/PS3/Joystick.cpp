@@ -10,6 +10,7 @@
 
 #include <l3xz_joy/PS3/Joystick.h>
 
+#include <poll.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -44,14 +45,23 @@ Joystick::~Joystick()
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-JoystickEvent Joystick::update()
+std::optional<JoystickEvent> Joystick::update()
 {
-	JoystickEvent evt;
-  
-  if (read(_fd, &evt, sizeof(JoystickEvent)) != sizeof(JoystickEvent))
-    throw std::runtime_error("Joystick::update: error on 'fread': " + std::string(strerror(errno)));
+  struct pollfd pfd;
+  pfd.fd = _fd;
+  pfd.events = POLLIN;
 
-  return evt;
+  int const rc = poll(&pfd, 1 /* 1 event */, 100 /* ms */);
+
+  if      (rc < 0) /* Error. */
+    throw std::runtime_error("Joystick::update: error on 'poll': " + std::string(strerror(errno)));
+  else if (rc == 0) /* Timeout. */
+    return std::nullopt;
+  else {
+    JoystickEvent evt;
+    read(_fd, &evt, sizeof(JoystickEvent));
+    return evt;
+  }
 }
 
 /**************************************************************************************

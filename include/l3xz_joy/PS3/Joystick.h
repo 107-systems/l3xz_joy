@@ -35,7 +35,7 @@ public:
 
   ~Joystick();
 
-  JoystickEvent update();
+  std::optional<JoystickEvent> update();
 
 private:
   int _fd;
