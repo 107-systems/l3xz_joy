@@ -14,7 +14,7 @@ A generic PS3 joystick driver for feeding the [l3xz_teleop](https://github.com/1
 ```bash
 colcon_ws/src$ git clone https://github.com/107-systems/l3xz_joy
 colcon_ws$ source /opt/ros/humble/setup.bash
-colcon_ws$ colcon build
+colcon_ws$ colcon build --packages-select l3xz_joy
 ```
 
 #### How-to-run
