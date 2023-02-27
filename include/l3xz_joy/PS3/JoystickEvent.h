@@ -34,8 +34,8 @@ public:
 
   uint32_t time;     /* event timestamp in milliseconds */
   int16_t  value;    /* value */
-  uint8_t  type;      /* event type */
-  uint8_t  number;    /* axis/button number */
+  uint8_t  type;     /* event type */
+  uint8_t  number;   /* axis/button number */
 
   inline bool isButton() const { return ((type & EVENT_BUTTON) == EVENT_BUTTON); }
   inline bool isAxis  () const { return ((type & EVENT_AXIS)   == EVENT_AXIS); }
