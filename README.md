@@ -22,7 +22,7 @@ colcon build --packages-select l3xz_joy
 #### How-to-run
 ```bash
 cd $COLCON_WS
-source install/setup.bash
+. install/setup.bash
 ros2 launch l3xz_joy joy.py
 ```
 Display the published messages by
