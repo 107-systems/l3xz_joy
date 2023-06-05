@@ -70,6 +70,14 @@ Node::~Node()
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
 
+void Node::init_heartbeat()
+{
+  std::stringstream heartbeat_topic;
+  heartbeat_topic << "/l3xz/" << get_name() << "/heartbeat";
+
+  _heartbeat_pub = heartbeat::Publisher::create(*this, heartbeat_topic.str(), HEARTBEAT_LOOP_RATE);
+}
+
 void Node::joystickThreadFunc()
 {
   _joy_thread_active = true;

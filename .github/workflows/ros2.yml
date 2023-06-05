@@ -45,7 +45,12 @@ jobs:
       with:
         repository: '107-systems/l3xz_joy'
         path: 'ros2_ws/src/l3xz_joy'
-        
+
+    - uses: actions/checkout@v3
+      with:
+        repository: '107-systems/ros2_heartbeat'
+        path: 'ros2_ws/src/ros2_heartbeat'
+
     - uses: actions/checkout@v3
       with:
         path: 'ros2_ws/src/l3xz_joy'
