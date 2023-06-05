@@ -10,12 +10,15 @@
 
 #include <map>
 #include <mutex>
+#include <chrono>
 #include <memory>
 #include <thread>
 
 #include <rclcpp/rclcpp.hpp>
 
 #include <sensor_msgs/msg/joy.hpp>
+
+#include <ros2_heartbeat/Publisher.h>
 
 #include "PS3/Joystick.h"
 
@@ -37,6 +40,10 @@ public:
   ~Node();
 
 private:
+  static std::chrono::milliseconds constexpr HEARTBEAT_LOOP_RATE{100};
+  heartbeat::Publisher::SharedPtr _heartbeat_pub;
+  void init_heartbeat();
+
   rclcpp::TimerBase::SharedPtr _joy_pub_timer;
  
   rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr _joy_pub;
