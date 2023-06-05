@@ -6,7 +6,7 @@ def generate_launch_description():
     Node(
       package='l3xz_joy',
       executable='l3xz_joy_node',
-      name='joy',
+      name='l3xz_joy',
       namespace='l3xz',
       output='screen',
       emulate_tty=True,
