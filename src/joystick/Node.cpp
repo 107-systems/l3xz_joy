@@ -50,6 +50,8 @@ Node::Node()
   declare_parameter("joy_topic_publish_period_ms", 50);
   declare_parameter("joy_deadzone", 0.01);
 
+  init_heartbeat();
+
   _joy_pub = create_publisher<sensor_msgs::msg::Joy>
     (get_parameter("joy_topic").as_string(), 10);
   
