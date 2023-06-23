@@ -48,7 +48,6 @@ private:
   rclcpp::TimerBase::SharedPtr _joy_pub_timer;
 
   rclcpp::QoS _joy_qos_profile;
-  rclcpp::PublisherOptions _joy_pub_options;
   rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr _joy_pub;
   sensor_msgs::msg::Joy _joy_msg;
   void init_pub();

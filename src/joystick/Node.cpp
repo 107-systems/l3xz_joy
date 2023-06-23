@@ -90,20 +90,9 @@ void Node::init_pub()
 
   _joy_qos_profile.deadline(joy_topic_deadline);
 
-  _joy_pub_options.event_callbacks.deadline_callback =
-    [this, joy_topic](rclcpp::QOSDeadlineOfferedInfo & event) -> void
-    {
-      RCLCPP_ERROR(get_logger(),
-                   "Dead line configured for topic %s missed (total_count: %d, total_count_change: %d).",
-                   joy_topic.c_str(),
-                   event.total_count,
-                   event.total_count_change);
-    };
-
   _joy_pub = create_publisher<sensor_msgs::msg::Joy>(
     joy_topic,
-    _joy_qos_profile,
-    _joy_pub_options
+    _joy_qos_profile
   );
 
   _joy_pub_timer = create_wall_timer(
