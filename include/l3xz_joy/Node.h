@@ -14,6 +14,7 @@
 #include <memory>
 #include <thread>
 
+#include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <sensor_msgs/msg/joy.hpp>
@@ -45,9 +46,12 @@ private:
   void init_heartbeat();
 
   rclcpp::TimerBase::SharedPtr _joy_pub_timer;
- 
+
+  rclcpp::QoS _joy_qos_profile;
+  rclcpp::PublisherOptions _joy_pub_options;
   rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr _joy_pub;
   sensor_msgs::msg::Joy _joy_msg;
+  void init_pub();
 
   std::shared_ptr<ps3::Joystick> _joystick;
   std::mutex _joy_mtx;
