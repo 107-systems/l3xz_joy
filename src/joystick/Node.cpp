@@ -55,6 +55,7 @@ Node::Node()
   declare_parameter("joy_topic", "joy");
   declare_parameter("joy_topic_publish_period_ms", 50);
   declare_parameter("joy_topic_deadline_ms", 100);
+  declare_parameter("joy_topic_liveliness_lease_duration", 1000);
   declare_parameter("joy_deadzone", 0.01);
 
   init_heartbeat();
@@ -87,8 +88,11 @@ void Node::init_pub()
   auto const joy_topic = get_parameter("joy_topic").as_string();
   auto const joy_topic_publish_period = std::chrono::milliseconds(get_parameter("joy_topic_publish_period_ms").as_int());
   auto const joy_topic_deadline = std::chrono::milliseconds(get_parameter("joy_topic_deadline_ms").as_int());
+  auto const joy_topic_liveliness_lease_duration = std::chrono::milliseconds(get_parameter("joy_topic_liveliness_lease_duration").as_int());
 
   _joy_qos_profile.deadline(joy_topic_deadline);
+  _joy_qos_profile.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
+  _joy_qos_profile.liveliness_lease_duration(joy_topic_liveliness_lease_duration);
 
   _joy_pub = create_publisher<sensor_msgs::msg::Joy>(
     joy_topic,

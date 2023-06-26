@@ -15,6 +15,7 @@ def generate_launch_description():
         {'joy_topic': 'joy'},
         {'joy_topic_publish_period_ms': 50},
         {'joy_topic_deadline_ms': 100},
+        {'joy_topic_liveliness_lease_duration': 1000},
         { 'joy_deadzone': 0.01 },
       ]
     )
