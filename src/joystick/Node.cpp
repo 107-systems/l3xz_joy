@@ -29,18 +29,24 @@ namespace l3xz::joystick
 
 Node::Node()
 : rclcpp::Node("l3xz_joy")
-,_joy_msg{
-    []()
-    {
-      sensor_msgs::msg::Joy msg;
+, _joy_qos_profile
+{
+  rclcpp::KeepLast(10),
+  rmw_qos_profile_sensor_data
+}
+,_joy_msg
+{
+  []()
+  {
+    sensor_msgs::msg::Joy msg;
 
-      msg.header.frame_id = "joy";
-      msg.axes.resize(ps3::NUM_AXES);
-      msg.buttons.resize(ps3::NUM_BUTTONS);
+    msg.header.frame_id = "joy";
+    msg.axes.resize(ps3::NUM_AXES);
+    msg.buttons.resize(ps3::NUM_BUTTONS);
 
-      return msg;
-    } ()
-  }
+    return msg;
+  } ()
+}
 , _joy_mtx{}
 , _joy_thread{}
 , _joy_thread_active{false}
@@ -48,15 +54,12 @@ Node::Node()
   declare_parameter("joy_dev_node", "/dev/input/js0");
   declare_parameter("joy_topic", "joy");
   declare_parameter("joy_topic_publish_period_ms", 50);
+  declare_parameter("joy_topic_deadline_ms", 100);
+  declare_parameter("joy_topic_liveliness_lease_duration", 1000);
   declare_parameter("joy_deadzone", 0.01);
 
   init_heartbeat();
-
-  _joy_pub = create_publisher<sensor_msgs::msg::Joy>
-    (get_parameter("joy_topic").as_string(), 10);
-  
-  _joy_pub_timer = create_wall_timer
-    (std::chrono::milliseconds(get_parameter("joy_topic_publish_period_ms").as_int()), [this]() { this->joystickPubFunc(); });
+  init_pub();
 
   _joystick   = std::make_shared<ps3::Joystick>(get_parameter("joy_dev_node").as_string());
   _joy_thread = std::thread([this]() { this->joystickThreadFunc(); });
@@ -78,6 +81,33 @@ void Node::init_heartbeat()
   heartbeat_topic << "/l3xz/" << get_name() << "/heartbeat";
 
   _heartbeat_pub = heartbeat::Publisher::create(*this, heartbeat_topic.str(), HEARTBEAT_LOOP_RATE);
+}
+
+void Node::init_pub()
+{
+  auto const joy_topic = get_parameter("joy_topic").as_string();
+  auto const joy_topic_publish_period = std::chrono::milliseconds(get_parameter("joy_topic_publish_period_ms").as_int());
+  auto const joy_topic_deadline = std::chrono::milliseconds(get_parameter("joy_topic_deadline_ms").as_int());
+  auto const joy_topic_liveliness_lease_duration = std::chrono::milliseconds(get_parameter("joy_topic_liveliness_lease_duration").as_int());
+
+  _joy_qos_profile.deadline(joy_topic_deadline);
+  _joy_qos_profile.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
+  _joy_qos_profile.liveliness_lease_duration(joy_topic_liveliness_lease_duration);
+
+  _joy_pub = create_publisher<sensor_msgs::msg::Joy>(
+    joy_topic,
+    _joy_qos_profile
+  );
+
+  _joy_pub_timer = create_wall_timer(
+    joy_topic_publish_period,
+    [this]()
+    {
+      std::lock_guard<std::mutex> lock(_joy_mtx);
+      _joy_msg.header.stamp = this->now();
+      _joy_pub->publish(_joy_msg);
+    }
+  );
 }
 
 void Node::joystickThreadFunc()
@@ -127,15 +157,6 @@ void Node::joystickThreadFunc()
         _joy_msg.buttons[ps3::BUTTON_TO_ARRAY_MAP.at(evt.value().number)] = evt.value().value;
     }
   }
-}
-
-void Node::joystickPubFunc()
-{
-  std::lock_guard<std::mutex> lock(_joy_mtx);
-
-  _joy_msg.header.stamp = this->now();
-
-  _joy_pub->publish(_joy_msg);
 }
 
 /**************************************************************************************

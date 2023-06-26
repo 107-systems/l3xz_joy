@@ -32,14 +32,16 @@ ros2 topic echo /l3xz/joy
 
 #### Interface Documentation
 ##### Published Topics
-| Default name | Type |
-|:-:|:-:|
-| `/joy` | [`sensor_msgs/Joy`](http://docs.ros.org/en/api/sensor_msgs/html/msg/Joy.html) |
+| Default name |                                      Type                                      |
+|:------------:|:------------------------------------------------------------------------------:|
+|   `/joy`     | [`sensor_msgs/Joy`](http://docs.ros.org/en/api/sensor_msgs/html/msg/Joy.html)  |
 
 ##### Parameters
-| Name | Default | Description |
-|:-:|:-:|-|
-| `joy_dev_node` | `/dev/input/js0` | Name of input device node under which joystick is registered in Linux. |
-| `joy_topic` | `/joy` | Name of topic for publishing the joystick message. |
-| `joy_topic_publish_period_ms` | 50 | Publishing period for the joystick message in milliseconds (ms). |
-| `joy_deadzone` | 0.01 | Deadzone of the joystick, if the axis value is below this value than 0.0 is reported instead. |
+|                  Name                 |     Default      | Description                                                                                   |
+|:-------------------------------------:|:----------------:|-----------------------------------------------------------------------------------------------|
+|             `joy_dev_node`            | `/dev/input/js0` | Name of input device node under which joystick is registered in Linux.                        |
+|              `joy_topic`              |      `/joy`      | Name of topic for publishing the joystick message.                                            |
+|     `joy_topic_publish_period_ms`     |        50        | Publishing period for the joystick message in milliseconds (ms).                              |
+|        `joy_topic_deadline_ms`        |       100        | Deadline in milliseconds within which publishing of a new joystick message is expected.       |
+| `joy_topic_liveliness_lease_duration` |      1000        | The time within which the RMW node or publisher must show that it is alive.                   | 
+|             `joy_deadzone`            |       0.01       | Deadzone of the joystick, if the axis value is below this value than 0.0 is reported instead. |
