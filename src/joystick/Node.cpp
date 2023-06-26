@@ -101,7 +101,12 @@ void Node::init_pub()
 
   _joy_pub_timer = create_wall_timer(
     joy_topic_publish_period,
-    [this]() { this->joystickPubFunc(); }
+    [this]()
+    {
+      std::lock_guard<std::mutex> lock(_joy_mtx);
+      _joy_msg.header.stamp = this->now();
+      _joy_pub->publish(_joy_msg);
+    }
   );
 }
 
@@ -152,15 +157,6 @@ void Node::joystickThreadFunc()
         _joy_msg.buttons[ps3::BUTTON_TO_ARRAY_MAP.at(evt.value().number)] = evt.value().value;
     }
   }
-}
-
-void Node::joystickPubFunc()
-{
-  std::lock_guard<std::mutex> lock(_joy_mtx);
-
-  _joy_msg.header.stamp = this->now();
-
-  _joy_pub->publish(_joy_msg);
 }
 
 /**************************************************************************************

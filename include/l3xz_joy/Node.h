@@ -58,7 +58,6 @@ private:
   std::atomic<bool> _joy_thread_active;
 
   void joystickThreadFunc();
-  void joystickPubFunc();
 };
 
 /**************************************************************************************
