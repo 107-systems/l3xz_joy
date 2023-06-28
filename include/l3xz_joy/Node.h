@@ -19,7 +19,7 @@
 
 #include <sensor_msgs/msg/joy.hpp>
 
-#include <ros2_heartbeat/Publisher.h>
+#include <ros2_heartbeat/publisher/Publisher.h>
 
 #include "PS3/Joystick.h"
 
@@ -41,7 +41,6 @@ public:
   ~Node();
 
 private:
-  static std::chrono::milliseconds constexpr HEARTBEAT_LOOP_RATE{100};
   heartbeat::Publisher::SharedPtr _heartbeat_pub;
   void init_heartbeat();
 
